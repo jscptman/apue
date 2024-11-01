@@ -4,7 +4,7 @@ use std::{
 };
 
 #[derive(Debug)]
-pub struct MsgError<T:Debug> {
+pub struct MsgError<T: Debug> {
     message: T,
 }
 
@@ -14,7 +14,7 @@ impl<T: Debug> MsgError<T> {
     }
 }
 
-impl<T:Debug> Display for MsgError<T>
+impl<T: Debug> Display for MsgError<T>
 where
     T: Display + Debug,
 {

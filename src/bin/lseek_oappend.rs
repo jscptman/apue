@@ -5,7 +5,7 @@ use std::{
 };
 
 fn main() -> Result<()> {
-  let mut read_buf = [0_u8; 6];
+    let mut read_buf = [0_u8; 6];
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -17,6 +17,9 @@ fn main() -> Result<()> {
     file.write(b" world!")?;
     file.seek(std::io::SeekFrom::Start(6))?;
     file.read(&mut read_buf)?;
-    println!("🚀 read_buf: {}", String::from_utf8(read_buf.to_vec()).unwrap());
+    println!(
+        "🚀 read_buf: {}",
+        String::from_utf8(read_buf.to_vec()).unwrap()
+    );
     Ok(())
 }

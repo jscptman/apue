@@ -1,9 +1,9 @@
 use r::common_mod::r_error::MsgError;
-use std::{collections::HashMap, fs::Metadata};
 #[cfg(target_family = "unix")]
 use r::common_mod::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
 #[cfg(target_family = "windows")]
 use r::common_mod::r_os::windows::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
+use std::{collections::HashMap, fs::Metadata};
 
 pub struct SingleTypeSummaryMetaData {
     meta_data: Vec<Metadata>,
@@ -34,7 +34,7 @@ pub struct FileStatisticSummary {
 }
 
 impl FileStatisticSummary {
-    pub fn compute_total(&mut self) -> usize {
+    fn compute_total(&mut self) -> usize {
         self.file_summary_map
             .values()
             .fold(0, |acc, cur| acc + cur.total())
@@ -47,7 +47,7 @@ impl FileStatisticSummary {
         } else {
             self.file_summary_map.insert(file_type.clone(), data);
         }
-        self.total += insert_count;
+        self.total = self.compute_total();
     }
     pub fn new() -> Self {
         FileStatisticSummary {
@@ -56,4 +56,3 @@ impl FileStatisticSummary {
         }
     }
 }
-
