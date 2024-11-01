@@ -9,10 +9,9 @@ fn main() {
             args.len()
         )
     }
-    ftw(Path::new(&args.next_back().unwrap()));
+    let result =  ftw(Path::new(&args.next_back().unwrap())).unwrap();
 }
-
-fn ftw(root: &Path, ) -> io::Result<FileStatisticSummary> {
+fn ftw(root: &Path) -> io::Result<FileStatisticSummary> {
     let file = OpenOptions::new().read(true).open(root)?;
     Ok(FileStatisticSummary::new())
 }
