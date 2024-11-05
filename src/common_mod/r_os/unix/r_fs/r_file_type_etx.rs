@@ -38,3 +38,28 @@ pub enum FileTypeEnum {
     Socket,
     Unknown,
 }
+impl FileTypeEnum {
+    pub fn convert_str(&self) -> &'static str {
+        match self {
+            Self::Regular => "regular",
+            Self::SymbolLink => "symlink",
+            Self::Directory => "directory",
+            Self::CharDevice => "char_device",
+            Self::BlockDevice => "block_device",
+            Self::Fifo => "fifo",
+            Self::Socket => "socket",
+            Self::Unknown => "unknown",
+        }
+    }
+}
+pub const FILE_TYPES_COUNT: usize = 8;
+pub const FILE_TYPES: [FileTypeEnum; FILE_TYPES_COUNT] = [
+    FileTypeEnum::Regular,
+    FileTypeEnum::SymbolLink,
+    FileTypeEnum::Directory,
+    FileTypeEnum::BlockDevice,
+    FileTypeEnum::CharDevice,
+    FileTypeEnum::Fifo,
+    FileTypeEnum::Socket,
+    FileTypeEnum::Unknown,
+];
