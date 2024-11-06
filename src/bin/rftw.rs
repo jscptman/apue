@@ -1,8 +1,7 @@
 mod summary;
 use r::common_mod::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt, FILE_TYPES};
 use std::{
-    env,
-    fs::{self},
+    env, fs,
     path::{Path, PathBuf},
 };
 use summary::FileStatisticSummary;
