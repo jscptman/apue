@@ -7,19 +7,28 @@ use std::{
 use summary::FileStatisticSummary;
 fn main() {
     let mut args = env::args();
-    if args.len() != 2 {
+    if args.len() < 2 {
         panic!(
-            "myftw:  require one argument but get {}\n myftw: usage: ftw root_path",
+            "myftw:  require one argument but get {}\n myftw: usage: ftw root_path [[-c]]",
             args.len()
         )
     }
     let mut unknown_files = Vec::new();
     let mut file_statistics = FileStatisticSummary::new();
-    ftw(
-        Path::new(&args.next_back().unwrap()),
-        &mut file_statistics,
-        &mut unknown_files,
-    );
+    if args.len() == 2 {
+        ftw(
+            Path::new(&args.next_back().unwrap()),
+            &mut file_statistics,
+            &mut unknown_files,
+        );
+    } else {
+        ftw_chdir(
+            Path::new(&args.next_back().unwrap()),
+            &mut file_statistics,
+            &mut unknown_files,
+        );
+    }
+
     print_statistics(&file_statistics);
 }
 
@@ -41,15 +50,38 @@ fn ftw(
                     ftw(&entry.path(), file_statistics, unknown_file_vec);
                 });
             }
-            _ => {
-                return;
-            }
+            _ => {}
         };
     } else {
         unknown_file_vec.push(root.to_path_buf());
     }
 }
-
+fn ftw_chdir(
+    root: &Path,
+    file_statistics: &mut FileStatisticSummary,
+    unknown_file_vec: &mut Vec<PathBuf>,
+) {
+    let meta_data = fs::symlink_metadata(root);
+    if let Ok(meta_data) = meta_data {
+        let file_type = meta_data.file_type().get_current_type();
+        file_statistics.push(meta_data);
+        match file_type {
+            FileTypeEnum::Directory => {
+                env::set_current_dir(root).expect("set_current_dir occurs an error");
+                let dir = fs::read_dir(".").unwrap_or_else(|e| {
+                    panic!("read_dir occurs an error: {:?}, path: {:?}", e, root)
+                });
+                dir.map(|entry_wrap| entry_wrap.unwrap()).for_each(|entry| {
+                    ftw(&entry.path(), file_statistics, unknown_file_vec);
+                });
+                env::set_current_dir("..").unwrap();
+            }
+            _ => {}
+        };
+    } else {
+        unknown_file_vec.push(root.to_path_buf());
+    }
+}
 fn print_statistics(statistics: &FileStatisticSummary) {
     let all_files_quantity = statistics.total();
     println!("🚀 total file count is: {}", all_files_quantity);
