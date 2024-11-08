@@ -5,6 +5,7 @@ use libc::{F_DUPFD, F_DUPFD_CLOEXEC, F_GETFD, F_GETFL};
 fn main() {
     let file = OpenOptions::new()
         .write(true)
+        .truncate(false)
         .read(true)
         .create(true)
         .open(Path::new("docs/test.txt"))

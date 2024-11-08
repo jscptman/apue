@@ -35,6 +35,6 @@ impl FileStatisticSummary {
         self.total
     }
     pub fn summary(&self) -> &Summary {
-        return &self.file_summary_map;
+        &self.file_summary_map
     }
 }

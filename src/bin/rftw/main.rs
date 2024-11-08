@@ -28,7 +28,6 @@ fn main() {
             &mut unknown_files,
         );
     }
-
     print_statistics(&file_statistics);
 }
 
@@ -41,21 +40,19 @@ fn ftw(
     if let Ok(meta_data) = meta_data {
         let file_type = meta_data.file_type().get_current_type();
         file_statistics.push(meta_data);
-        match file_type {
-            FileTypeEnum::Directory => {
-                let dir = root.read_dir().unwrap_or_else(|e| {
-                    panic!("read_dir occurs an error: {:?}, path: {:?}", e, root)
-                });
-                dir.map(|entry_wrap| entry_wrap.unwrap()).for_each(|entry| {
-                    ftw(&entry.path(), file_statistics, unknown_file_vec);
-                });
-            }
-            _ => {}
-        };
+        if file_type == FileTypeEnum::Directory {
+            let dir = root
+                .read_dir()
+                .unwrap_or_else(|e| panic!("read_dir occurs an error: {:?}, path: {:?}", e, root));
+            dir.map(|entry_wrap| entry_wrap.unwrap()).for_each(|entry| {
+                ftw(&entry.path(), file_statistics, unknown_file_vec);
+            });
+        }
     } else {
         unknown_file_vec.push(root.to_path_buf());
     }
 }
+
 fn ftw_chdir(
     root: &Path,
     file_statistics: &mut FileStatisticSummary,
@@ -65,23 +62,20 @@ fn ftw_chdir(
     if let Ok(meta_data) = meta_data {
         let file_type = meta_data.file_type().get_current_type();
         file_statistics.push(meta_data);
-        match file_type {
-            FileTypeEnum::Directory => {
-                env::set_current_dir(root).expect("set_current_dir occurs an error");
-                let dir = fs::read_dir(".").unwrap_or_else(|e| {
-                    panic!("read_dir occurs an error: {:?}, path: {:?}", e, root)
-                });
-                dir.map(|entry_wrap| entry_wrap.unwrap()).for_each(|entry| {
-                    ftw(&entry.path(), file_statistics, unknown_file_vec);
-                });
-                env::set_current_dir("..").unwrap();
-            }
-            _ => {}
-        };
+        if file_type == FileTypeEnum::Directory {
+            env::set_current_dir(root).expect("set_current_dir occurs an error");
+            let dir = fs::read_dir(".")
+                .unwrap_or_else(|e| panic!("read_dir occurs an error: {:?}, path: {:?}", e, root));
+            dir.map(|entry_wrap| entry_wrap.unwrap()).for_each(|entry| {
+                ftw(&entry.path(), file_statistics, unknown_file_vec);
+            });
+            env::set_current_dir("..").unwrap();
+        }
     } else {
         unknown_file_vec.push(root.to_path_buf());
     }
 }
+
 fn print_statistics(statistics: &FileStatisticSummary) {
     let all_files_quantity = statistics.total();
     println!("🚀 total file count is: {}", all_files_quantity);

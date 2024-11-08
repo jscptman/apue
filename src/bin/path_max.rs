@@ -8,14 +8,14 @@ fn main() {
     let leaf_dir_name = "ABCDEFGHIJ";
     set_current_dir("/home/jscptman").unwrap();
     loop {
-        match fs::create_dir(&leaf_dir_name) {
+        match fs::create_dir(leaf_dir_name) {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("function create_dir occurs an error: {:?}\nleaf_directory_path: {}\nleaf_path_length: {}", e, leaf_dir_name, leaf_dir_name.len());
                 return;
             }
         }
-        set_current_dir(&leaf_dir_name).unwrap_or_else(|e| {
+        set_current_dir(leaf_dir_name).unwrap_or_else(|e| {
             panic!(
                 "function set_current_dir occurs an error: {:?}, leaf_dir_name is: {}",
                 e, leaf_dir_name
