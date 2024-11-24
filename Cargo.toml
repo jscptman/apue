@@ -6,4 +6,6 @@ version = "0.1.0"
 [dependencies]
 ascii = "~1.1.0"
 chrono = "~0.4.38"
+chrono-tz = "0.10.0"
+iana-time-zone = "0.1.61"
 libc = "~0.2.162"
