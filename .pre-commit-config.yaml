@@ -11,7 +11,7 @@ repos:
       - id: taplo-linting
         name: Taplo linting
         description: Run taplo fmt on files included in the commit.
-        entry: taplo fmt --check --
+        entry: taplo fmt --
         pass_filenames: true
         types: [file, toml]
         language: system
