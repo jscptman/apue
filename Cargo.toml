@@ -8,5 +8,5 @@ ascii = "~1.1.0"
 chrono = "~0.4.39"
 chrono-tz = "~0.10.0"
 iana-time-zone = "~0.1.61"
-libc = "~0.2.168"
+libc = "~0.2.169"
 nix = { version = "~0.29.0", features = ["fs", "dir"] }
