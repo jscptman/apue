@@ -262,7 +262,6 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "iana-time-zone",
- "libc",
  "nix",
 ]
 

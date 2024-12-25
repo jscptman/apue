@@ -1,5 +1,5 @@
 mod summary;
-use r::common_mod::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt, FILE_TYPES};
+use r::common::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt, FILE_TYPES};
 use std::{
     env, fs,
     path::{Path, PathBuf},

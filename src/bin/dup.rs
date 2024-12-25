@@ -1,16 +1,14 @@
-use std::io::stdin;
+use std::{io, os::fd::AsRawFd};
 
-use libc::STDOUT_FILENO;
+use nix::unistd;
 
 fn main() {
-    println!("🚀 123");
-    unsafe {
-        let fd1 = libc::dup(STDOUT_FILENO);
-        let fd2 = libc::dup(STDOUT_FILENO);
-        let fd3 = libc::dup(STDOUT_FILENO);
-        println!("🚀 fd: {fd1}");
-        println!("🚀 fd: {fd2}");
-        println!("🚀 fd: {fd3}");
-    };
-    stdin().read_line(&mut String::from("")).unwrap();
+    let stdout = io::stdout().lock();
+    let stdout_fileno = stdout.as_raw_fd();
+    let fd1 = unistd::dup(stdout_fileno).unwrap();
+    let fd2 = unistd::dup(stdout_fileno).unwrap();
+    let fd3 = unistd::dup(stdout_fileno).unwrap();
+    println!("🚀 fd: {fd1}");
+    println!("🚀 fd: {fd2}");
+    println!("🚀 fd: {fd3}");
 }

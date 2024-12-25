@@ -1,1 +1,1 @@
-pub mod common_mod;
+pub mod common;

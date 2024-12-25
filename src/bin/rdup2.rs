@@ -1,5 +1,7 @@
 use std::os::fd::RawFd;
 
+use nix::unistd;
+
 fn main() {
     let fd = my_dup2(1, 15);
     println!("result_fd: {}", fd);
@@ -13,19 +15,17 @@ fn my_dup2(fd1: RawFd, fd2: RawFd) -> RawFd {
     if fd1 == fd2 {
         fd1
     } else {
-        unsafe {
-            loop {
-                let fd_temp = libc::dup(fd1);
-                if fd_temp == -1 {
-                    break -1;
-                } else if fd_temp != fd2 {
-                    fd_temp_vec.push(fd_temp);
-                } else {
-                    for (index, fd) in fd_temp_vec.iter().enumerate() {
-                        println!("🚀 fd_temp{}: {}", index, fd);
-                    }
-                    break fd_temp;
+        loop {
+            let fd_temp = unistd::dup(fd1).expect("dup occurs an error");
+            if fd_temp == -1 {
+                break -1;
+            } else if fd_temp != fd2 {
+                fd_temp_vec.push(fd_temp);
+            } else {
+                for (index, fd) in fd_temp_vec.iter().enumerate() {
+                    println!("🚀 fd_temp{}: {}", index, fd);
                 }
+                break fd_temp;
             }
         }
     }

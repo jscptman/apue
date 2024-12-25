@@ -1,7 +1,7 @@
 #[cfg(target_family = "unix")]
-use r::common_mod::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
+use r::common::r_os::unix::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
 #[cfg(target_family = "windows")]
-use r::common_mod::r_os::windows::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
+use r::common::r_os::windows::r_fs::r_file_type_etx::{FileTypeEnum, RFileTypeExt};
 use std::{collections::HashMap, fs::Metadata};
 
 type Summary = HashMap<FileTypeEnum, Vec<Metadata>>;
