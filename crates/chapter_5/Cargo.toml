@@ -1,0 +1,18 @@
+[package]
+authors.workspace = true
+edition.workspace = true
+name = "chapter_5"
+publish.workspace = true
+repository = "https://github.com/jscptman/apue/chapter_5"
+version = "0.1.0"
+
+[[bin]]
+name = "5_1"
+path = "src/bin/5.1.rs"
+
+[[bin]]
+name = "5_7"
+path = "src/bin/5.7.rs"
+
+[dependencies]
+nix = { workspace = true, features = [] }

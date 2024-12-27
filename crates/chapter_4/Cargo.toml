@@ -1,0 +1,25 @@
+[package]
+authors.workspace = true
+edition.workspace = true
+name = "chapter_4"
+publish.workspace = true
+repository = "https://github.com/jscptman/apue/chapter_4"
+version = "0.1.0"
+
+[[bin]]
+name = "4_6"
+path = "src/bin/4.6.rs"
+
+[[bin]]
+name = "4_11"
+path = "src/bin/4.11/4.11.rs"
+required-features = ["apue_common"]
+
+[[bin]]
+name = "4_16"
+path = "src/bin/4.16.rs"
+required-features = ["nix"]
+
+[dependencies]
+apue_common = { workspace = true, optional = true }
+nix = { workspace = true, features = ["fs", "feature"], optional = true }

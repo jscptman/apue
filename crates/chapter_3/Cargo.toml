@@ -1,0 +1,19 @@
+[package]
+authors.workspace = true
+edition.workspace = true
+name = "chapter_3"
+publish.workspace = true
+repository = "https://github.com/jscptman/apue/chapter_3"
+version = "0.1.0"
+
+[[bin]]
+name = "3_2"
+path = "src/bin/3.2.rs"
+required-features = ["nix"]
+
+[[bin]]
+name = "3_6"
+path = "src/bin/3.6.rs"
+
+[dependencies]
+nix = { workspace = true, features = ["feature", "fs"], optional = true }

@@ -1,0 +1,28 @@
+[package]
+authors.workspace = true
+edition.workspace = true
+name = "chapter_8"
+publish.workspace = true
+repository = "https://github.com/jscptman/apue/chapter_8"
+version = "0.1.0"
+
+[[bin]]
+name = "8_1"
+path = "src/bin/8.1.rs"
+required-features = ["nix"]
+
+[[bin]]
+name = "8_3"
+path = "src/bin/8.3.rs"
+
+[[bin]]
+name = "8_6"
+path = "src/bin/8.6.rs"
+
+[[bin]]
+name = "8_7"
+path = "src/bin/8.7.rs"
+required-features = ["nix/dir", "nix/feature"]
+
+[dependencies]
+nix = { workspace = true, optional = true }

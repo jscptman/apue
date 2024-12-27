@@ -1,0 +1,23 @@
+[package]
+authors.workspace = true
+edition.workspace = true
+name = "chapter_6"
+publish.workspace = true
+repository = "https://github.com/jscptman/apue/chapter_5"
+version = "0.1.0"
+
+[[bin]]
+name = "6_3"
+path = "src/bin/6.3.rs"
+required-features = ["nix"]
+
+[[bin]]
+name = "6_5"
+path = "src/bin/6.5.rs"
+required-features = ["chrono", "iana-time-zone", "chrono-tz"]
+
+[dependencies]
+chrono = { version = "~0.4.39", optional = true }
+chrono-tz = { version = "~0.10.0", optional = true }
+iana-time-zone = { version = "~0.1.61", optional = true }
+nix = { workspace = true, features = ['feature'], optional = true }
