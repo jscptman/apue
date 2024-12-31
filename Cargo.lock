@@ -94,9 +94,6 @@ dependencies = [
 [[package]]
 name = "chapter_5"
 version = "0.1.0"
-dependencies = [
- "nix",
-]
 
 [[package]]
 name = "chapter_6"
