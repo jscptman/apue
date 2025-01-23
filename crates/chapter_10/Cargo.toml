@@ -10,5 +10,12 @@ version = "0.1.0"
 name = "10_2"
 path = "src/bin/10.2.rs"
 
+[[bin]]
+name = "10_6"
+path = "src/bin/10.6.rs"
+
 [dependencies]
-nix = { workspace = true, features = ["signal"] }
+nix = { workspace = true }
+
+[features]
+default = ["nix/signal"]
