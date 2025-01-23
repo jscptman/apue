@@ -22,9 +22,7 @@ fn open_max() -> i64 {
         );
     });
     match limit {
-        Some(limit) => {
-            return limit;
-        }
+        Some(limit) => limit,
         None => {
             let (software_limit, hardware_limit) = resource::getrlimit(Resource::RLIMIT_NOFILE)
                 .unwrap_or_else(|errno| {
@@ -43,9 +41,9 @@ fn open_max() -> i64 {
                 && hardware_limit == resource::RLIM_INFINITY
             {
                 println!("🚀 use guess");
-                return OPEN_MAX_GUESS;
+                OPEN_MAX_GUESS
             } else {
-                return cmp::min(software_limit, hardware_limit) as i64;
+                cmp::min(software_limit, hardware_limit) as i64
             }
         }
     }
