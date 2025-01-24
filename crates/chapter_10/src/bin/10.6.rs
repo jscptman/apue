@@ -1,7 +1,6 @@
 use std::{
     fs::{File, OpenOptions},
-    io::{Read, Result as IOResult, Seek, Write},
-    process,
+    io::{Read, Result as IOResult, Seek, SeekFrom, Write},
     sync::Mutex,
 };
 
@@ -19,8 +18,9 @@ use nix::{
 };
 
 static COUNTER_FILE: Mutex<Option<File>> = Mutex::new(None);
-static PID: Mutex<Option<Pid>> = Mutex::new(None);
-static PPID: Mutex<Option<Pid>> = Mutex::new(None);
+static PID: Mutex<Option<Pid>> = Mutex::new(None); // child process id
+static PPID: Mutex<Option<Pid>> = Mutex::new(None); // parent process id
+const MAX_WRITE_COUNT: u32 = 30;
 fn main() {
     let mut sigset_old = SigSet::empty();
     // 阻塞所有信号
@@ -48,8 +48,8 @@ fn main() {
     COUNTER_FILE.lock().unwrap().replace(file);
     match unsafe { unistd::fork() } {
         Ok(Parent { child }) => {
-            PID.lock().unwrap().replace(unistd::getpid());
-            PPID.lock().unwrap().replace(child);
+            PID.lock().unwrap().replace(child);
+            PPID.lock().unwrap().replace(unistd::getpid());
             println!("🚀 parentID: {}, childId: {}", unistd::getpid(), child);
             unsafe {
                 signal::sigaction(
@@ -98,6 +98,7 @@ fn main() {
 }
 
 extern "C" fn sig_handler(signo: i32) {
+    block_all_signals();
     println!(
         "🚀 received signo: {}",
         Signal::try_from(signo).unwrap_or_else(|errno| {
@@ -111,35 +112,75 @@ extern "C" fn sig_handler(signo: i32) {
         "child"
     };
     let file = &mut *COUNTER_FILE.lock().unwrap();
-    let desc = Signal::try_from(signo).unwrap().as_str().to_string();
-    let current_count = increase_counter(file.as_mut().unwrap(), desc).unwrap_or_else(|error| {
+    let current_count = increase_counter(file.as_mut().unwrap()).unwrap_or_else(|error| {
         eprintln!("failed to increase counter: {:?}", error.kind());
         std::process::exit(error.raw_os_error().unwrap());
     });
-    if current_count == 10 {
-        if which_process == "parent" {
-            signal::kill(PID.lock().unwrap().unwrap(), SIGKILL).unwrap_or_else(|errno| {
-                eprintln!("Failed to send SIGIOT signal to child: {:?}", errno.desc());
-                std::process::exit(1);
-            });
-            process::exit(0);
-        } else {
-            signal::kill(PPID.lock().unwrap().unwrap(), SIGKILL).unwrap_or_else(|errno| {
-                eprintln!("Failed to send SIGIOT signal to parent: {:?}", errno.desc());
-                std::process::exit(1);
-            });
-            process::exit(0);
-        }
+    println!(
+        "🚀 {} process added one, current_count={}",
+        which_process, current_count
+    );
+
+    if current_count == MAX_WRITE_COUNT {
+        kill_process(PPID.lock().unwrap().unwrap());
+        return;
+    } else if which_process == "parent" {
+        signal::kill(PID.lock().unwrap().unwrap().clone(), SIGUSR2).unwrap_or_else(|errno| {
+            eprintln!(
+                "Failed to send SIGUSR2 signal to process: {:?}",
+                errno.desc()
+            );
+            std::process::exit(1);
+        });
+        let mut sig_set = SigSet::all();
+        sig_set.remove(SIGUSR1);
+        sig_set.suspend().unwrap_or_else(|errno| {
+            eprintln!("Parent failed to suspend: {:?}", errno.desc());
+            std::process::exit(1);
+        });
+    } else if which_process == "child" {
+        signal::kill(PPID.lock().unwrap().unwrap(), SIGUSR1).unwrap_or_else(|errno| {
+            eprintln!(
+                "Failed to send SIGUSR1 signal to process: {:?}",
+                errno.desc()
+            );
+            std::process::exit(1);
+        });
+        let mut sig_set = SigSet::all();
+        sig_set.remove(SIGUSR2);
+        sig_set.suspend().unwrap_or_else(|errno| {
+            eprintln!("Parent failed to suspend: {:?}", errno.desc());
+            std::process::exit(1);
+        });
     }
 }
 
-fn increase_counter(file: &mut File, desc: impl AsRef<str>) -> IOResult<u32> {
+fn increase_counter(file: &mut File) -> IOResult<u32> {
     let mut buf = String::new();
-    file.seek(std::io::SeekFrom::Start(0))?;
+    file.seek(SeekFrom::Start(0))?;
     let length = file.read_to_string(&mut buf)?;
-    println!("🚀 buf: {}", buf);
+    println!("🚀buf: {}", buf);
+    file.set_len(0)?;
     let counter = buf[..length].parse::<u32>().unwrap();
-    let write_content = format!("{}, counter={}", desc.as_ref(), counter + 1);
+    let write_content = format!("{}", counter + 1);
+    file.seek(SeekFrom::Start(0))?;
     file.write_all(write_content.as_bytes())?;
     Ok(counter + 1)
+}
+
+fn kill_process(pid: Pid) {
+    signal::kill(pid, SIGKILL).unwrap_or_else(|errno| {
+        eprintln!(
+            "Failed to send SIGKILL signal to process: {:?}",
+            errno.desc()
+        );
+        std::process::exit(1);
+    });
+}
+
+fn block_all_signals() {
+    signal::sigprocmask(SIG_SETMASK, Some(&SigSet::all()), None).unwrap_or_else(|errno| {
+        eprintln!("Failed to block all signals: {:?}", errno.desc());
+        std::process::exit(1);
+    });
 }
