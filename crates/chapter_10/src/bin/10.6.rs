@@ -1,6 +1,7 @@
 use std::{
     fs::{File, OpenOptions},
     io::{Read, Result as IOResult, Seek, SeekFrom, Write},
+    process,
     sync::Mutex,
 };
 
@@ -8,7 +9,7 @@ use nix::{
     sys::signal::{
         self, SaFlags, SigAction, SigHandler, SigSet,
         SigmaskHow::SIG_SETMASK,
-        Signal::{SIGKILL, SIGUSR1, SIGUSR2},
+        Signal::{self, SIGKILL, SIGUSR1, SIGUSR2},
     },
     unistd::{
         self,
@@ -20,33 +21,15 @@ use nix::{
 static COUNTER_FILE: Mutex<Option<File>> = Mutex::new(None);
 static CHILD_ID: Mutex<Option<Pid>> = Mutex::new(None); // child process id
 static PARENT_ID: Mutex<Option<Pid>> = Mutex::new(None); // parent process id
-const MAX_WRITE_COUNT: u32 = 30;
+const MAX_WRITE_COUNT: u32 = 300;
 fn main() {
     // 阻塞所有信号
-    signal::sigprocmask(SIG_SETMASK, Some(&SigSet::all()), None).unwrap_or_else(|errno| {
-        eprintln!("Failed to block signals: {:?}", errno.desc());
-        std::process::exit(1);
-    });
-    // 创建文件
-    let mut file = OpenOptions::new()
-        .write(true)
-        .read(true)
-        .create(true)
-        .truncate(true)
-        .open("temp/10.6.txt")
-        .unwrap_or_else(|error| {
-            eprintln!("Failed to open file: {:?}", error.kind());
-            std::process::exit(error.raw_os_error().unwrap());
-        });
-    file.write_all(b"0").unwrap_or_else(|error| {
-        eprintln!("Failed to write file: {:?}", error.kind());
-        std::process::exit(error.raw_os_error().unwrap());
-    });
-    COUNTER_FILE.lock().unwrap().replace(file);
+    block_all_signals();
+    // 初始化文件
+    COUNTER_FILE.lock().unwrap().replace(init_file());
     match unsafe { unistd::fork() } {
         Ok(Parent { child }) => {
             CHILD_ID.lock().unwrap().replace(child);
-            PARENT_ID.lock().unwrap().replace(unistd::getpid());
             println!("🚀 parentID: {}, childId: {}", unistd::getpid(), child);
             unsafe {
                 signal::sigaction(
@@ -96,58 +79,19 @@ fn main() {
 }
 
 extern "C" fn sig_handler(signo: i32) {
-    block_all_signals();
-    let which_process = if signo == SIGUSR1 as i32 {
-        "parent"
-    } else {
-        "child"
-    };
-
-    {
-        let file = &mut *COUNTER_FILE.lock().unwrap();
-        let current_count = increase_counter(file.as_mut().unwrap()).unwrap_or_else(|error| {
+    let signal = Signal::try_from(signo).unwrap();
+    let current_count = increase_counter(COUNTER_FILE.lock().unwrap().as_mut().unwrap())
+        .unwrap_or_else(|error| {
             eprintln!("failed to increase counter: {:?}", error.kind());
             std::process::exit(error.raw_os_error().unwrap());
         });
-        println!(
-            "🚀 {} process added one, current_count={}",
-            which_process, current_count
-        );
-        if current_count == MAX_WRITE_COUNT {
-            kill_process(PARENT_ID.lock().unwrap().unwrap());
-            return;
-        }
-    } // 新增完成后解锁
-
-    if which_process == "parent" {
-        signal::kill(CHILD_ID.lock().unwrap().unwrap(), SIGUSR2).unwrap_or_else(|errno| {
-            eprintln!(
-                "Failed to send SIGUSR2 signal to process: {:?}",
-                errno.desc()
-            );
-            std::process::exit(1);
-        });
-        let mut sig_set = SigSet::all();
-        sig_set.remove(SIGUSR1);
-        sig_set.suspend().unwrap_or_else(|errno| {
-            eprintln!("Parent failed to suspend: {:?}", errno.desc());
-            std::process::exit(1);
-        });
-    } else if which_process == "child" {
-        signal::kill(PARENT_ID.lock().unwrap().unwrap(), SIGUSR1).unwrap_or_else(|errno| {
-            eprintln!(
-                "Failed to send SIGUSR1 signal to process: {:?}",
-                errno.desc()
-            );
-            std::process::exit(1);
-        });
-        let mut sig_set = SigSet::all();
-        sig_set.remove(SIGUSR2);
-        sig_set.suspend().unwrap_or_else(|errno| {
-            eprintln!("Parent failed to suspend: {:?}", errno.desc());
-            std::process::exit(1);
-        });
-    }
+    println!(
+        "🚀 process={}, current_count={}",
+        process::id(),
+        current_count
+    );
+    let reach_increase_upper_limit = current_count == MAX_WRITE_COUNT;
+    handle_sigusr(reach_increase_upper_limit, signal);
 }
 
 fn increase_counter(file: &mut File) -> IOResult<u32> {
@@ -175,6 +119,52 @@ fn kill_process(pid: Pid) {
 fn block_all_signals() {
     signal::sigprocmask(SIG_SETMASK, Some(&SigSet::all()), None).unwrap_or_else(|errno| {
         eprintln!("Failed to block all signals: {:?}", errno.desc());
+        std::process::exit(1);
+    });
+}
+
+fn init_file() -> File {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .read(true)
+        .create(true)
+        .truncate(true)
+        .open("10.6.txt")
+        .unwrap_or_else(|error| {
+            eprintln!("Failed to open file: {:?}", error.kind());
+            std::process::exit(error.raw_os_error().unwrap());
+        });
+    file.write_all(b"0").unwrap_or_else(|error| {
+        eprintln!("Failed to write file: {:?}", error.kind());
+        std::process::exit(error.raw_os_error().unwrap());
+    });
+    file
+}
+
+fn handle_sigusr(reach_increase_upper_limit: bool, current_signal: Signal) {
+    let (target_process, target_signal) = if current_signal == SIGUSR1 {
+        (CHILD_ID.lock().unwrap().unwrap(), SIGUSR2)
+    } else if current_signal == SIGUSR2 {
+        (PARENT_ID.lock().unwrap().unwrap(), SIGUSR1)
+    } else {
+        panic!("got unexpected signal: {:?}", current_signal);
+    };
+    if reach_increase_upper_limit {
+        kill_process(target_process);
+        process::exit(0);
+    }
+    block_all_signals();
+    signal::kill(target_process, target_signal).unwrap_or_else(|errno| {
+        eprintln!(
+            "Failed to send SIGUSR2 signal to process: {:?}",
+            errno.desc()
+        );
+        std::process::exit(1);
+    });
+    let mut sig_set = SigSet::all();
+    sig_set.remove(current_signal);
+    sig_set.suspend().unwrap_or_else(|errno| {
+        eprintln!("Parent failed to suspend: {:?}", errno.desc());
         std::process::exit(1);
     });
 }
