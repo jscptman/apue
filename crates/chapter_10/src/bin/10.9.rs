@@ -11,7 +11,7 @@ fn main() {
     let mut sigset = SigSet::empty();
     sigset.add(SIGINT);
     sigset.add(SIGALRM);
-    pr_mask("origin mask").unwrap_or_else(|errno| {
+    pr_mask("original mask").unwrap_or_else(|errno| {
         panic!("line={}, pr_mask occurs an error: {}", line!(), errno);
     });
     signal::sigprocmask(SIG_BLOCK, Some(&sigset), None).unwrap_or_else(|errno| {
