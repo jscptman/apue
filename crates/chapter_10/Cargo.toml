@@ -14,6 +14,10 @@ path = "src/bin/10.2.rs"
 name = "10_6"
 path = "src/bin/10.6.rs"
 
+[[bin]]
+name = "10_9"
+path = "src/bin/10.9.rs"
+
 [dependencies]
 nix = { workspace = true }
 
