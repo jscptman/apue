@@ -5,6 +5,7 @@ use std::{
     sync::Mutex,
 };
 
+use nix::libc::c_int;
 use nix::{
     sys::signal::{
         self, SaFlags, SigAction, SigHandler, SigSet,
@@ -78,7 +79,7 @@ fn main() {
     }
 }
 
-extern "C" fn sig_handler(signo: i32) {
+extern "C" fn sig_handler(signo: c_int) {
     let signal = Signal::try_from(signo).unwrap();
     let current_count = increase_counter(COUNTER_FILE.lock().unwrap().as_mut().unwrap())
         .unwrap_or_else(|error| {
