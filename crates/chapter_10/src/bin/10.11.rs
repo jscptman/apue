@@ -1,12 +1,14 @@
+#![allow(clippy::transmute_ptr_to_ref)]
+
 use nix::libc::{c_int, siginfo_t};
 use nix::sys::resource::{self, Resource::RLIMIT_FSIZE, RLIM_INFINITY};
 use nix::sys::signal::{self, SaFlags, SigAction, SigHandler, SigSet, SIGXFSZ};
+use nix::sys::signalfd::siginfo;
+use nix::ucontext::UContext;
 use std::ffi::c_void;
-use std::io::{Read, Result as IOResult, Write};
-use std::{io, process};
-
+use std::io::{self, Read, Result as IOResult, Write};
+use std::{mem, process};
 const BUFFSIZE: usize = 100;
-
 fn main() -> IOResult<()> {
     resource::setrlimit(RLIMIT_FSIZE, 1024, RLIM_INFINITY)?;
     let mut mask = SigSet::all();
@@ -16,7 +18,7 @@ fn main() -> IOResult<()> {
             SIGXFSZ,
             &SigAction::new(
                 SigHandler::SigAction(sigxfsz_handler),
-                SaFlags::SA_SIGINFO,
+                SaFlags::SA_RESTART | SaFlags::SA_SIGINFO,
                 mask,
             ),
         )
@@ -37,4 +39,10 @@ fn main() -> IOResult<()> {
 }
 extern "C" fn sigxfsz_handler(signo: c_int, siginfo: *mut siginfo_t, context: *mut c_void) {
     println!("handler called with {:?}", signo);
+    unsafe {
+        let ucontext: &UContext = mem::transmute(context);
+        let siginfo: &siginfo = mem::transmute(siginfo);
+        println!("context: {:?}", ucontext);
+        println!("siginfo: {:?}", *siginfo);
+    }
 }
