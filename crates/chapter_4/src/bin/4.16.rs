@@ -14,7 +14,7 @@ fn main() {
     let file_name_max = unistd::pathconf(CURRENT_DIR, PathconfVar::NAME_MAX)
         .expect("get NAME_MAX occurs an error")
         .unwrap();
-    let leaf_dir = &"a".repeat((file_name_max) as usize);
+    let leaf_dir = &"a".repeat(file_name_max as usize);
     println!("🚀 path_max={}", path_max);
     println!("🚀 name_max={}", file_name_max);
     set_current_dir(CURRENT_DIR).unwrap();

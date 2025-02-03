@@ -20,7 +20,7 @@ fn main() {
         });
         match sig2str(input) {
             Ok(signal) => println!("signo: {}, signal: {}", input, signal),
-            Err(e) => eprintln!("errno: {}, 5: {}", Errno::last_raw(), e.desc()),
+            Err(e) => eprintln!("errno: {}, {}", Errno::last_raw(), e.desc()),
         }
     }
 }

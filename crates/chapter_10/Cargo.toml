@@ -25,7 +25,7 @@ required-features = ["chrono"]
 
 [dependencies]
 chrono = { version = "~0.4.39", optional = true }
-nix = { workspace = true }
+nix = { workspace = true, features = ["signal"] }
 
 [features]
 default = ["nix/signal"]

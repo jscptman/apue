@@ -42,14 +42,14 @@ fn main() {
                 )
                 .unwrap_or_else(|errno| {
                     eprintln!("Failed to set SIGUSR1 signal handler: {:?}", errno.desc());
-                    std::process::exit(1);
+                    process::exit(1);
                 });
             };
             let mut sigset = SigSet::all();
             sigset.remove(SIGUSR1);
             sigset.suspend().unwrap_or_else(|errno| {
                 eprintln!("Parent failed to suspend: {:?}", errno.desc());
-                std::process::exit(1);
+                process::exit(1);
             });
         }
         Ok(Child) => {
@@ -69,7 +69,7 @@ fn main() {
             sigset.remove(SIGUSR2);
             sigset.suspend().unwrap_or_else(|errno| {
                 eprintln!("Child failed to suspend: {:?}", errno.desc());
-                std::process::exit(1);
+                process::exit(1);
             });
         }
         Err(errno) => {
@@ -83,7 +83,7 @@ extern "C" fn sig_handler(signo: i32) {
     let current_count = increase_counter(COUNTER_FILE.lock().unwrap().as_mut().unwrap())
         .unwrap_or_else(|error| {
             eprintln!("failed to increase counter: {:?}", error.kind());
-            std::process::exit(error.raw_os_error().unwrap());
+            process::exit(error.raw_os_error().unwrap());
         });
     println!(
         "🚀 process={}, current_count={}",
@@ -112,14 +112,14 @@ fn kill_process(pid: Pid) {
             "Failed to send SIGKILL signal to process: {:?}",
             errno.desc()
         );
-        std::process::exit(1);
+        process::exit(1);
     });
 }
 
 fn block_all_signals() {
     signal::sigprocmask(SIG_SETMASK, Some(&SigSet::all()), None).unwrap_or_else(|errno| {
         eprintln!("Failed to block all signals: {:?}", errno.desc());
-        std::process::exit(1);
+        process::exit(1);
     });
 }
 
@@ -132,11 +132,11 @@ fn init_file() -> File {
         .open("10.6.txt")
         .unwrap_or_else(|error| {
             eprintln!("Failed to open file: {:?}", error.kind());
-            std::process::exit(error.raw_os_error().unwrap());
+            process::exit(error.raw_os_error().unwrap());
         });
     file.write_all(b"0").unwrap_or_else(|error| {
         eprintln!("Failed to write file: {:?}", error.kind());
-        std::process::exit(error.raw_os_error().unwrap());
+        process::exit(error.raw_os_error().unwrap());
     });
     file
 }
@@ -159,12 +159,12 @@ fn handle_sigusr(reach_increase_upper_limit: bool, current_signal: Signal) {
             "Failed to send SIGUSR2 signal to process: {:?}",
             errno.desc()
         );
-        std::process::exit(1);
+        process::exit(1);
     });
     let mut sig_set = SigSet::all();
     sig_set.remove(current_signal);
     sig_set.suspend().unwrap_or_else(|errno| {
         eprintln!("Parent failed to suspend: {:?}", errno.desc());
-        std::process::exit(1);
+        process::exit(1);
     });
 }

@@ -11,13 +11,12 @@ fn main() -> Result<(), io::Error> {
         cmd.pre_exec(|| {
             process::exit(8);
         })
-        .status()
-        .unwrap()
+        .status()?
     };
     pr_exit(cmd.get_program(), &status);
 
     cmd = Command::new("program2");
-    status = unsafe { cmd.pre_exec(|| process::abort()).status().unwrap() };
+    status = unsafe { cmd.pre_exec(|| process::abort()).status()? };
     pr_exit(cmd.get_program(), &status);
 
     cmd = Command::new("program3");
@@ -27,8 +26,7 @@ fn main() -> Result<(), io::Error> {
             let _ = 1.0 / 0.0;
             unreachable!();
         })
-        .status()
-        .unwrap()
+        .status()?
     };
     pr_exit(cmd.get_program(), &status);
     Ok(())

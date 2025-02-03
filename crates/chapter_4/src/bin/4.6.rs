@@ -20,7 +20,7 @@ fn main() {
 }
 
 fn make_hole_file(path: &Path, buffer: &[u8]) -> Result<()> {
-    let file: std::fs::File = OpenOptions::new()
+    let file = OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)

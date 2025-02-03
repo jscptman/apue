@@ -25,4 +25,4 @@ path = "src/bin/8.7.rs"
 required-features = ["nix/dir", "nix/feature"]
 
 [dependencies]
-nix = { workspace = true, optional = true }
+nix = { workspace = true, optional = true, features = ["dir"] }
