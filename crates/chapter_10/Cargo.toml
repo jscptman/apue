@@ -18,7 +18,13 @@ path = "src/bin/10.6.rs"
 name = "10_9"
 path = "src/bin/10.9.rs"
 
+[[bin]]
+name = "10_10"
+path = "src/bin/10.10.rs"
+required-features = ["chrono"]
+
 [dependencies]
+chrono = { version = "~0.4.39", optional = true }
 nix = { workspace = true }
 
 [features]
