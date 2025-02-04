@@ -1,8 +1,8 @@
 use core::panic;
 use nix::{errno::Errno, sys::signal::Signal, Result};
 use std::io::stdin;
+use std::process;
 use std::str::{self, FromStr};
-
 fn main() {
     let mut buf = String::new();
     loop {
@@ -14,9 +14,9 @@ fn main() {
         if buf == "\n" {
             continue;
         }
-        let input = i32::from_str(buf.trim()).unwrap_or_else(|error| {
+        let input = i32::from_str(buf.trim()).unwrap_or_else(|_| {
             eprintln!("Invalid input, except number found {}", buf);
-            panic!("error: {:?}", error.kind());
+            process::exit(0);
         });
         match sig2str(input) {
             Ok(signal) => println!("signo: {}, signal: {}", input, signal),

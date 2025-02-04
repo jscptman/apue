@@ -26,7 +26,7 @@ required-features = ["chrono"]
 [[bin]]
 name = "10_11"
 path = "src/bin/10.11.rs"
-required-features = ["nix/resource", "nix/ucontext"]
+required-features = ["10_11"]
 
 [[bin]]
 name = "10_12"
@@ -34,11 +34,8 @@ path = "src/bin/10.12.rs"
 
 [dependencies]
 chrono = { version = "~0.4.39", optional = true }
-nix = { workspace = true, features = [
-  "signal",
-  "resource",
-  "ucontext",
-], optional = true }
+nix = { workspace = true, optional = true }
 
 [features]
+10_11 = ["nix/resource", "nix/ucontext"]
 default = ["nix/signal"]

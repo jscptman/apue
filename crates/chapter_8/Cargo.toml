@@ -22,7 +22,10 @@ path = "src/bin/8.6.rs"
 [[bin]]
 name = "8_7"
 path = "src/bin/8.7.rs"
-required-features = ["nix/dir", "nix/feature"]
+required-features = ["8_7"]
 
 [dependencies]
-nix = { workspace = true, optional = true, features = ["dir"] }
+nix = { workspace = true, optional = true }
+
+[features]
+8_7 = ["nix/dir", "nix/feature"]
