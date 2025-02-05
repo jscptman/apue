@@ -22,7 +22,7 @@ use nix::{
 static COUNTER_FILE: Mutex<Option<File>> = Mutex::new(None);
 static CHILD_ID: Mutex<Option<Pid>> = Mutex::new(None); // child process id
 static PARENT_ID: Mutex<Option<Pid>> = Mutex::new(None); // parent process id
-const MAX_WRITE_COUNT: u32 = 300;
+const MAX_WRITE_COUNT: u32 = 3000;
 fn main() {
     // 阻塞所有信号
     block_all_signals();
@@ -157,7 +157,8 @@ fn handle_sigusr(reach_increase_upper_limit: bool, current_signal: Signal) {
     block_all_signals();
     signal::kill(target_process, target_signal).unwrap_or_else(|errno| {
         eprintln!(
-            "Failed to send SIGUSR2 signal to process: {:?}",
+            "Failed to send {:?} signal to process: {:?}",
+            current_signal,
             errno.desc()
         );
         process::exit(1);
