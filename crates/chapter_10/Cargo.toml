@@ -9,33 +9,43 @@ version = "0.1.0"
 [[bin]]
 name = "10_2"
 path = "src/bin/10.2.rs"
+required-features = ["signal"]
+
+[[bin]]
+name = "10_5"
+path = "src/bin/10.5.rs"
+required-features = ["signal"]
 
 [[bin]]
 name = "10_6"
 path = "src/bin/10.6.rs"
+required-features = ["signal"]
 
 [[bin]]
 name = "10_9"
 path = "src/bin/10.9.rs"
+required-features = ["signal"]
 
 [[bin]]
 name = "10_10"
 path = "src/bin/10.10.rs"
-required-features = ["chrono"]
+required-features = ["10_10"]
 
 [[bin]]
 name = "10_11"
 path = "src/bin/10.11.rs"
-required-features = ["10_11"]
+required-features = ["10_11", "signal"]
 
 [[bin]]
 name = "10_12"
 path = "src/bin/10.12.rs"
+required-features = ["signal"]
 
 [dependencies]
 chrono = { version = "~0.4.39", optional = true }
 nix = { workspace = true, optional = true }
 
 [features]
+10_10 = ["chrono"]
 10_11 = ["nix/resource", "nix/ucontext"]
-default = ["nix/signal"]
+signal = ["nix/signal"]

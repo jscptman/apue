@@ -24,7 +24,7 @@ fn main() -> IOResult<()> {
     };
     let mut stream = BufWriter::with_capacity(BUFFSIZE, File::create("10_12")?);
     println!("🚀 capacity={}", stream.capacity());
-    let tmp = vec![b'A'; 5_000_000_000]; // 3GB的数据
+    let tmp = vec![b'A'; 5_000_000_000]; // 5GB的数据
     println!("🚀 begin write");
     alarm::set(2); // 设置2秒后发送SIGALRM信号
     let mut last_write = 0;
