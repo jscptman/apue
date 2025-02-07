@@ -1,3 +1,6 @@
+use nix::sys::signal;
+use nix::sys::signal::SigAction;
+use nix::sys::signal::{SaFlags, SigHandler, SigSet, SIGALRM};
 use nix::unistd;
 use std::cell::RefCell;
 use std::time::Duration;
@@ -23,8 +26,14 @@ struct CustomTimer {
     finish_callback: fn() -> Result<(), TimerCallBackError>,
     call_at: Instant, // timer_uuid: &'timer_uuid str,
 }
-
 fn main() {
+    unsafe {
+        signal::sigaction(
+            SIGALRM,
+            &SigAction::new(SigHandler::SigIgn, SaFlags::empty(), SigSet::all()),
+        )
+        .unwrap()
+    };
     set_timeout(4, || {
         println!("timeout");
         Ok(())
@@ -77,12 +86,21 @@ fn pr_queue() {
     })
 }
 
-fn poll_alarm() {
-    TIMER_QUEUE.with_borrow(|queue| {
+fn poll_alarm() -> Result<(), Box<dyn Error>> {
+    TIMER_QUEUE.with_borrow_mut(|queue| -> Result<(), Box<dyn Error>> {
         while !queue.is_empty() {
             let timer = queue.front().unwrap();
             let second = (timer.call_at - Instant::now()).as_secs_f32() as u32;
+            println!("seconds={}", second);
             unistd::alarm::set(second);
+            let mut sigset = SigSet::empty();
+            sigset.add(SIGALRM);
+            sigset.wait().expect("sigset.wait occurs an error");
+            (timer.finish_callback)().unwrap_or_else(|error| {
+                println!("timer finish callback returned error: {}", error);
+            });
+            queue.pop_front();
         }
-    });
+        Ok(())
+    })
 }
