@@ -24,7 +24,7 @@ static TIMER_QUEUE: RefCell<VecDeque<CustomTimer>> = RefCell::new(VecDeque::new(
 struct CustomTimer {
     created_at: Instant,
     finish_callback: fn() -> Result<(), TimerCallBackError>,
-    call_at: Instant, // timer_uuid: &'timer_uuid str,
+    call_at: Instant,
 }
 fn main() {
     unsafe {
@@ -86,8 +86,8 @@ fn pr_queue() {
     })
 }
 
-fn poll_alarm() -> Result<(), Box<dyn Error>> {
-    TIMER_QUEUE.with_borrow_mut(|queue| -> Result<(), Box<dyn Error>> {
+fn poll_alarm() {
+    TIMER_QUEUE.with_borrow_mut(|queue| {
         while !queue.is_empty() {
             let timer = queue.front().unwrap();
             let second = (timer.call_at - Instant::now()).as_secs_f32() as u32;
@@ -101,6 +101,5 @@ fn poll_alarm() -> Result<(), Box<dyn Error>> {
             });
             queue.pop_front();
         }
-        Ok(())
     })
 }
