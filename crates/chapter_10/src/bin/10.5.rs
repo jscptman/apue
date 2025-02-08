@@ -3,6 +3,7 @@ use nix::sys::signal::SigAction;
 use nix::sys::signal::{SaFlags, SigHandler, SigSet, SIGALRM};
 use nix::unistd;
 use std::cell::RefCell;
+use std::ffi::c_int;
 use std::time::Duration;
 use std::{collections::VecDeque, error::Error, fmt::Display, time::Instant};
 
@@ -18,11 +19,10 @@ impl Error for TimerCallBackError {}
 type TimerCallBackFn = fn() -> Result<(), TimerCallBackError>;
 
 thread_local! {
-static TIMER_QUEUE: RefCell<VecDeque<CustomTimer>> = RefCell::new(VecDeque::new());
+static TIMER_QUEUE: RefCell<VecDeque<CustomTimer>> = const{RefCell::new(VecDeque::new())};
 }
 #[derive(Debug)]
 struct CustomTimer {
-    created_at: Instant,
     finish_callback: fn() -> Result<(), TimerCallBackError>,
     call_at: Instant,
 }
@@ -30,7 +30,11 @@ fn main() {
     unsafe {
         signal::sigaction(
             SIGALRM,
-            &SigAction::new(SigHandler::SigIgn, SaFlags::empty(), SigSet::all()),
+            &SigAction::new(
+                SigHandler::Handler(alarm_handler),
+                SaFlags::empty(),
+                SigSet::all(),
+            ),
         )
         .unwrap()
     };
@@ -47,15 +51,15 @@ fn main() {
         Ok(())
     });
     pr_queue();
+    poll_alarm();
 }
 
-fn set_timeout(seconds: u64, callback: TimerCallBackFn) {
+fn set_timeout(seconds: u32, callback: TimerCallBackFn) {
     let created_at = Instant::now();
     insert_timer(CustomTimer {
-        created_at,
         finish_callback: callback,
         call_at: created_at
-            .checked_add(Duration::from_secs(seconds))
+            .checked_add(Duration::from_secs(seconds as u64))
             .expect("can't overflow"),
     })
 }
@@ -63,7 +67,6 @@ fn set_timeout(seconds: u64, callback: TimerCallBackFn) {
 fn insert_timer(timer: CustomTimer) {
     let position = insert_position(&timer);
     TIMER_QUEUE.with_borrow_mut(|queue| queue.insert(position, timer));
-    poll_alarm();
 }
 
 fn insert_position(timer: &CustomTimer) -> usize {
@@ -90,16 +93,20 @@ fn poll_alarm() {
     TIMER_QUEUE.with_borrow_mut(|queue| {
         while !queue.is_empty() {
             let timer = queue.front().unwrap();
-            let second = (timer.call_at - Instant::now()).as_secs_f32() as u32;
-            println!("seconds={}", second);
-            unistd::alarm::set(second);
+            println!("{:?},{:?}", timer, Instant::now());
+            let sleep_time = (timer.call_at - Instant::now()).as_secs_f32().round() as u32;
+            println!("sleep_time: {}", sleep_time);
+            unistd::alarm::set(sleep_time);
             let mut sigset = SigSet::empty();
             sigset.add(SIGALRM);
-            sigset.wait().expect("sigset.wait occurs an error");
+            println!("进入等待状态");
+            sigset.wait().unwrap();
             (timer.finish_callback)().unwrap_or_else(|error| {
-                println!("timer finish callback returned error: {}", error);
+                eprintln!("timer finish callback returned error: {}", error)
             });
             queue.pop_front();
         }
-    })
+    });
 }
+
+extern "C" fn alarm_handler(_: c_int) {}
