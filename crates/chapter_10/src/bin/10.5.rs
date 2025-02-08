@@ -5,7 +5,7 @@ use nix::unistd::alarm;
 use std::cell::RefCell;
 use std::ffi::c_int;
 use std::time::Duration;
-use std::{collections::VecDeque, error::Error, fmt::Display, process, time::Instant};
+use std::{collections::VecDeque, error::Error, fmt::Display, time::Instant};
 
 #[derive(Debug)]
 struct TimerCallBackError;
@@ -90,19 +90,22 @@ fn pr_queue() {
 }
 
 fn poll_alarm() {
-    let call_at = TIMER_QUEUE.with_borrow(|queue| match queue.front() {
-        Some(timer) => timer.call_at,
-        None => process::exit(0),
-    });
-    let sleep_time = (call_at - Instant::now()).as_secs_f32().round() as u32;
-    alarm::set(sleep_time);
-    let mut sigset = SigSet::all();
-    sigset.remove(SIGALRM);
-    sigset.suspend().unwrap();
+    timer_call_at_list().iter().for_each(|call_at| {
+        let sleep_time = (*call_at - Instant::now()).as_secs_f32().round() as u32;
+        alarm::set(sleep_time);
+        let mut sigset = SigSet::all();
+        sigset.remove(SIGALRM);
+        sigset.suspend().unwrap();
+    })
+}
+
+fn timer_call_at_list() -> Vec<Instant> {
+    TIMER_QUEUE.with_borrow(|queue| -> Vec<Instant> {
+        queue.iter().map(|timer| timer.call_at).collect::<Vec<_>>()
+    })
 }
 extern "C" fn alarm_handler(_: c_int) {
     let timer = TIMER_QUEUE.with_borrow_mut(|queue| queue.pop_front().unwrap());
     (timer.finish_callback)()
         .unwrap_or_else(|error| eprintln!("timer finish callback returned error: {}", error));
-    poll_alarm();
 }
