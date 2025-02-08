@@ -21,6 +21,7 @@ type TimerCallBackFn = fn() -> Result<(), TimerCallBackError>;
 thread_local! {
 static TIMER_QUEUE: RefCell<VecDeque<CustomTimer>> = const{RefCell::new(VecDeque::new())};
 }
+
 #[derive(Debug)]
 struct CustomTimer {
     finish_callback: fn() -> Result<(), TimerCallBackError>,
@@ -104,6 +105,7 @@ fn timer_call_at_list() -> Vec<Instant> {
         queue.iter().map(|timer| timer.call_at).collect::<Vec<_>>()
     })
 }
+
 extern "C" fn alarm_handler(_: c_int) {
     let timer = TIMER_QUEUE.with_borrow_mut(|queue| queue.pop_front().unwrap());
     (timer.finish_callback)()
