@@ -93,13 +93,11 @@ fn poll_alarm() {
     TIMER_QUEUE.with_borrow_mut(|queue| {
         while !queue.is_empty() {
             let timer = queue.front().unwrap();
-            println!("{:?},{:?}", timer, Instant::now());
             let sleep_time = (timer.call_at - Instant::now()).as_secs_f32().round() as u32;
             println!("sleep_time: {}", sleep_time);
             unistd::alarm::set(sleep_time);
             let mut sigset = SigSet::empty();
             sigset.add(SIGALRM);
-            println!("进入等待状态");
             sigset.wait().unwrap();
             (timer.finish_callback)().unwrap_or_else(|error| {
                 eprintln!("timer finish callback returned error: {}", error)
