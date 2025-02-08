@@ -6,6 +6,7 @@ resolver = "2"
 authors = ["Sword Coming <impish-clang-swell@duck.com>"]
 edition = "2021"
 publish = false
+repository = "https://github.com/jscptman/apue"
 
 [workspace.dependencies]
 apue_common = { path = "crates/apue_common", version = "~0.1.0" }
