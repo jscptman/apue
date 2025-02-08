@@ -3,9 +3,12 @@
 {
 	"name": "Rust",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/rust:1-1-bookworm",
+//	"image": "mcr.microsoft.com/devcontainers/rust:dev-1-bookworm",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "rustup --version"
+	"postCreateCommand": "rustup --version",
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	// "mounts": [
 	// 	{
@@ -26,5 +29,5 @@
 	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	 "remoteUser": "sword_comming"
 }
