@@ -8,7 +8,7 @@
 		"dockerfile": "Dockerfile"
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "rustup --version",
+	"postCreateCommand": "rustup --version"
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	// "mounts": [
 	// 	{
