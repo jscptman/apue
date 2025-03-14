@@ -1,10 +1,11 @@
+#![cfg(feature = "signal")]
 use nix::{
+    Result as NixResult,
     sys::signal::{
         self, SigSet,
         SigmaskHow::{SIG_BLOCK, SIG_UNBLOCK},
         Signal::{self, SIGALRM, SIGINT},
     },
-    Result as NixResult,
 };
 
 fn main() {

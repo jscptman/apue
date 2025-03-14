@@ -1,3 +1,4 @@
+#![cfg(feature = "6_5")]
 use chrono::{Local, TimeZone};
 use chrono_tz::Tz;
 fn main() {

@@ -1,6 +1,6 @@
-use std::os::fd::RawFd;
-
+#[cfg(feature = "3_2")]
 use nix::{errno::Errno, unistd};
+use std::os::fd::RawFd;
 
 fn main() {
     let fd = my_dup2(1, 15);

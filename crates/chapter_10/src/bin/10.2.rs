@@ -1,5 +1,6 @@
+#![cfg(feature = "signal")]
 use core::panic;
-use nix::{errno::Errno, sys::signal::Signal, Result};
+use nix::{Result, errno::Errno, sys::signal::Signal};
 use std::io::stdin;
 use std::process;
 use std::str::{self, FromStr};

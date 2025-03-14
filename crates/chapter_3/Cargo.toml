@@ -9,7 +9,7 @@ version = "0.1.0"
 [[bin]]
 name = "3_2"
 path = "src/bin/3.2.rs"
-required-features = ["nix"]
+required-features = ["3_2"]
 
 [[bin]]
 name = "3_6"
@@ -17,3 +17,6 @@ path = "src/bin/3.6.rs"
 
 [dependencies]
 nix = { workspace = true, features = ["feature", "fs"], optional = true }
+
+[features]
+3_2 = ["dep:nix"]

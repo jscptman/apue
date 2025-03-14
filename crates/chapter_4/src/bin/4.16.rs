@@ -24,7 +24,12 @@ fn main() {
                 total += 1;
             }
             Err(e) => {
-                eprintln!("function create_dir occurs an error: {:?}\nleaf_directory_path: {}\nleaf_path_length: {}", e, leaf_dir, leaf_dir.len());
+                eprintln!(
+                    "function create_dir occurs an error: {:?}\nleaf_directory_path: {}\nleaf_path_length: {}",
+                    e,
+                    leaf_dir,
+                    leaf_dir.len()
+                );
                 return;
             }
         }

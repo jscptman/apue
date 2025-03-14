@@ -1,10 +1,9 @@
-#[cfg(target_family = "windows")]
-use apue::os::windows::fs::file_type_etx::{FileTypeEnum, FileTypeExt};
-#[cfg(target_family = "unix")]
+#![deny(warnings)]
+#![cfg(feature = "apue_common")]
 use apue_common::os::unix::fs::file_type_etx::{FileTypeEnum, FileTypeExt};
 use std::{collections::HashMap, fs::Metadata};
-
 type Summary = HashMap<FileTypeEnum, Vec<Metadata>>;
+
 pub struct FileStatisticSummary {
     file_summary_map: Summary,
     total: usize,

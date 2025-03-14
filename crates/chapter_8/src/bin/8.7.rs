@@ -1,3 +1,4 @@
+#![cfg(feature = "8_7")]
 use std::{fs::OpenOptions, io, os::fd::AsRawFd};
 
 use nix::{

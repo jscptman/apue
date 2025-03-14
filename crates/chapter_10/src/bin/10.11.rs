@@ -1,8 +1,8 @@
 #![allow(clippy::transmute_ptr_to_ref)]
-
+#![cfg(feature = "10_11")]
 use nix::libc::{c_int, siginfo_t};
-use nix::sys::resource::{self, Resource::RLIMIT_FSIZE, RLIM_INFINITY};
-use nix::sys::signal::{self, SaFlags, SigAction, SigHandler, SigSet, SIGXFSZ};
+use nix::sys::resource::{self, RLIM_INFINITY, Resource::RLIMIT_FSIZE};
+use nix::sys::signal::{self, SIGXFSZ, SaFlags, SigAction, SigHandler, SigSet};
 use nix::sys::signalfd::siginfo;
 use nix::ucontext::UContext;
 use std::ffi::c_void;

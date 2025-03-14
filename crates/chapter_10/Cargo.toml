@@ -29,15 +29,15 @@ required-features = ["signal"]
 [[bin]]
 name = "10_10"
 path = "src/bin/10.10.rs"
-required-features = ["question_10"]
+required-features = ["10_10"]
 
 [[bin]]
 name = "10_11"
 path = "src/bin/10.11.rs"
-required-features = ["question_11", "signal"]
+required-features = ["10_11", "signal"]
 
 [[bin]]
-name = "10_12"
+name = "signal"
 path = "src/bin/10.12.rs"
 required-features = ["signal"]
 
@@ -46,6 +46,6 @@ chrono = { version = "~0.4.39", optional = true }
 nix = { workspace = true, optional = true }
 
 [features]
-question_10 = ["chrono"]
-question_11 = ["nix/resource", "nix/ucontext"]
+10_10 = ["dep:chrono"]
+10_11 = ["nix/resource", "nix/ucontext"]
 signal = ["nix/signal"]

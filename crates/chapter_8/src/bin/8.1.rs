@@ -1,3 +1,4 @@
+#![cfg(feature = "8_1")]
 use std::{
     io,
     os::{fd::AsRawFd, unix::process::CommandExt},

@@ -72,7 +72,10 @@ fn main() {
 }
 
 fn print_process_ids(label: &str, pid: Pid, ppid: Pid, pgrp: Pid, tcpgrp: Pid, sid: Pid) {
-    println!("🚀 {}: process_id: {}, parent_process_id: {}, process_group_id: {}, foreground_process_group_id: {}, session_id: {}", label, pid, ppid, pgrp, tcpgrp, sid);
+    println!(
+        "🚀 {}: process_id: {}, parent_process_id: {}, process_group_id: {}, foreground_process_group_id: {}, session_id: {}",
+        label, pid, ppid, pgrp, tcpgrp, sid
+    );
 }
 
 fn print_sys_error(line_no: u32, errno: Errno) {

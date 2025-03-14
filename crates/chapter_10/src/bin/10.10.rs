@@ -1,3 +1,4 @@
+#![cfg(feature = "10_10")]
 use chrono::{Local, Timelike};
 use std::{thread, time::Duration};
 

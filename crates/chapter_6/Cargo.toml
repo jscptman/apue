@@ -9,15 +9,19 @@ version = "0.1.0"
 [[bin]]
 name = "6_3"
 path = "src/bin/6.3.rs"
-required-features = ["nix"]
+required-features = ["6_3"]
 
 [[bin]]
 name = "6_5"
 path = "src/bin/6.5.rs"
-required-features = ["chrono", "iana-time-zone", "chrono-tz"]
+required-features = ["6_5"]
 
 [dependencies]
 chrono = { version = "~0.4.39", optional = true }
 chrono-tz = { version = "~0.10.1", optional = true }
 iana-time-zone = { version = "~0.1.61", optional = true }
 nix = { workspace = true, features = ['feature'], optional = true }
+
+[features]
+6_3 = ["dep:nix"]
+6_5 = ["dep:chrono", "dep:iana-time-zone", "dep:chrono-tz"]

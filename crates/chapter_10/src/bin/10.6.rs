@@ -1,3 +1,4 @@
+#![cfg(feature = "signal")]
 use std::{
     fs::{File, OpenOptions},
     io::{Read, Result as IOResult, Seek, SeekFrom, Write},

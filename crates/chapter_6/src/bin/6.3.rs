@@ -1,3 +1,4 @@
+#![cfg(feature = "6_3")]
 use nix::sys::utsname as n_utsname;
 use std::ffi::OsStr;
 struct UtsnameFieldsAddressPair<'a, 'b>(&'a str, &'b OsStr);

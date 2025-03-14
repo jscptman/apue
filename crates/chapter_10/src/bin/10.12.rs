@@ -1,3 +1,4 @@
+#![cfg(feature = "signal")]
 use std::{
     cmp,
     fs::File,
@@ -5,7 +6,7 @@ use std::{
 };
 
 use nix::{
-    sys::signal::{self, SaFlags, SigAction, SigHandler, SIGALRM},
+    sys::signal::{self, SIGALRM, SaFlags, SigAction, SigHandler},
     unistd::alarm,
 };
 const MAX_RW_COUNT_HALF: usize = 2147479552 / 2; // 内核最大支持的单次写入字节数的一半

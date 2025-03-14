@@ -1,5 +1,6 @@
+#![cfg(feature = "4_11")]
 mod summary;
-use apue_common::os::unix::fs::file_type_etx::{FileTypeEnum, FileTypeExt, FILE_TYPES};
+use apue_common::os::unix::fs::file_type_etx::{FILE_TYPES, FileTypeEnum, FileTypeExt};
 use std::{env, fs, path::Path};
 use summary::FileStatisticSummary;
 fn main() {

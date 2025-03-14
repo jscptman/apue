@@ -1,6 +1,7 @@
+#![cfg(feature = "signal")]
 use nix::sys::signal;
 use nix::sys::signal::SigAction;
-use nix::sys::signal::{SaFlags, SigHandler, SigSet, SIGALRM};
+use nix::sys::signal::{SIGALRM, SaFlags, SigHandler, SigSet};
 use nix::unistd::alarm;
 use std::cell::RefCell;
 use std::ffi::c_int;
