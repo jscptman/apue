@@ -1,13 +1,15 @@
 #![allow(clippy::transmute_ptr_to_ref)]
-#![cfg(feature = "10_11")]
+#![cfg(feature = "bin_10_11")]
+
 use nix::libc::{c_int, siginfo_t};
 use nix::sys::resource::{self, RLIM_INFINITY, Resource::RLIMIT_FSIZE};
 use nix::sys::signal::{self, SIGXFSZ, SaFlags, SigAction, SigHandler, SigSet};
-use nix::sys::signalfd::siginfo;
+#[cfg(target_os = "linux")]
 use nix::ucontext::UContext;
 use std::ffi::c_void;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Result as IOResult, Write};
+#[cfg(target_os = "linux")]
 use std::mem;
 const BUFFSIZE: usize = 100;
 fn main() -> IOResult<()> {
@@ -39,17 +41,17 @@ fn main() -> IOResult<()> {
             break;
         }
         if out_file.write(&buf[..n])? != BUFFSIZE {
-            println!("partial write");
+            println!("partially write");
         }
     }
     Ok(())
 }
 extern "C" fn sigxfsz_handler(signo: c_int, siginfo: *mut siginfo_t, context: *mut c_void) {
-    println!("handler called with {:?}", signo);
+    println!("handler called with {}", signo);
+    #[cfg(target_os = "linux")]
     unsafe {
-        let ucontext: &UContext = mem::transmute(context);
-        let siginfo: &siginfo = mem::transmute(siginfo);
-        println!("context: {:?}", ucontext);
+        let ucontext: *mut UContext = mem::transmute(context);
+        println!("context: {:?}", *ucontext);
         println!("siginfo: {:?}", *siginfo);
     }
 }

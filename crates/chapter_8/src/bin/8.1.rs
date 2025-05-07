@@ -1,4 +1,4 @@
-#![cfg(feature = "8_1")]
+#![cfg(feature = "bin_8_1")]
 use std::{
     io,
     os::{fd::AsRawFd, unix::process::CommandExt},
@@ -18,7 +18,7 @@ fn main() -> Result<(), io::Error> {
     unistd::close(stdout.as_raw_fd()).expect("close stdout occurs an error");
     println!(
         "🚀 child exit code: {}",
-        status.code().expect("child was terminated by a signal")
+        status.code().expect("the child was terminated by a signal")
     );
     Ok(())
 }

@@ -1,4 +1,4 @@
-#![cfg(feature = "4_11")]
+#![cfg(feature = "bin_4_11")]
 mod summary;
 use apue_common::os::unix::fs::file_type_etx::{FILE_TYPES, FileTypeEnum, FileTypeExt};
 use std::{env, fs, path::Path};

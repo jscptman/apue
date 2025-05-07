@@ -1,4 +1,4 @@
-#![cfg(feature = "10_10")]
+#![cfg(feature = "bin_10_10")]
 use chrono::{Local, Timelike};
 use std::{thread, time::Duration};
 

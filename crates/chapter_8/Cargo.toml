@@ -9,7 +9,7 @@ version = "0.1.0"
 [[bin]]
 name = "8_1"
 path = "src/bin/8.1.rs"
-required-features = ["8_1"]
+required-features = ["bin_8_1"]
 
 [[bin]]
 name = "8_3"
@@ -22,11 +22,11 @@ path = "src/bin/8.6.rs"
 [[bin]]
 name = "8_7"
 path = "src/bin/8.7.rs"
-required-features = ["8_7"]
+required-features = ["bin_8_7"]
 
 [dependencies]
 nix = { workspace = true, optional = true }
 
 [features]
-8_1 = ["dep:nix"]
-8_7 = ["nix/dir", "nix/feature"]
+bin_8_1 = ["dep:nix"]
+bin_8_7 = ["nix/dir", "nix/feature"]

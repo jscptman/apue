@@ -13,18 +13,18 @@ path = "src/bin/4.6.rs"
 [[bin]]
 name = "4_11"
 path = "src/bin/4.11/4.11.rs"
-required-features = ["4_11"]
+required-features = ["bin_4_11"]
 
 [[bin]]
 name = "4_16"
 path = "src/bin/4.16.rs"
-required-features = ["4_16"]
+required-features = ["bin_4_16"]
 
 [dependencies]
 apue_common = { workspace = true, optional = true }
 nix = { workspace = true, features = ["fs", "feature"], optional = true }
 
 [features]
-4_11 = ["apue_common"]
-4_16 = ["dep:nix"]
 apue_common = ["dep:apue_common"]
+bin_4_11 = ["apue_common"]
+bin_4_16 = ["dep:nix"]

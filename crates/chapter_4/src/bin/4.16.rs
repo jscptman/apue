@@ -35,7 +35,7 @@ fn main() {
         }
         set_current_dir(leaf_dir).unwrap_or_else(|e| {
             panic!(
-                "function set_current_dir occurs an error: {:?}, leaf_dir_name is: {}",
+                "function set_current_dir occurs an error: {}, leaf_dir_name is: {}",
                 e, leaf_dir
             )
         });

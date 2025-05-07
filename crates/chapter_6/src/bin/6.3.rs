@@ -1,4 +1,4 @@
-#![cfg(feature = "6_3")]
+#![cfg(feature = "bin_6_3")]
 use nix::sys::utsname as n_utsname;
 use std::ffi::OsStr;
 struct UtsnameFieldsAddressPair<'a, 'b>(&'a str, &'b OsStr);
@@ -8,6 +8,7 @@ fn main() {
         UtsnameFieldsAddressPair("sysname", utsname.sysname()),
         UtsnameFieldsAddressPair("nodename", utsname.nodename()),
         UtsnameFieldsAddressPair("release", utsname.release()),
+        #[cfg(target_os = "linux")]
         UtsnameFieldsAddressPair("domainname", utsname.domainname()),
         UtsnameFieldsAddressPair("machine", utsname.machine()),
         UtsnameFieldsAddressPair("version", utsname.version()),
