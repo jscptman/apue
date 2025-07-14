@@ -18,7 +18,7 @@ required-features = ["bin_6_5"]
 
 [dependencies]
 chrono = { version = "~0.4.41", optional = true }
-chrono-tz = { version = "~0.10.3", optional = true }
+chrono-tz = { version = "~0.10.4", optional = true }
 iana-time-zone = { version = "~0.1.63", optional = true }
 nix = { workspace = true, features = ['feature'], optional = true }
 
