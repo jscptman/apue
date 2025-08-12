@@ -1,2 +1,26 @@
 #[build]
 #target = "x86_64-unknown-linux-gnu" # ["x86_64-pc-windows-msvc", "x86_64-apple-darwin, "x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
+
+#更改crates源为国内镜像
+[source.crates-io]
+replace-with = 'aliyun' # 指定使用下面哪个源，修改为source.后面的内容即可
+
+#阿里云
+[source.aliyun]
+registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"
+
+# 中国科学技术大学
+[source.ustc]
+registry = "https://mirrors.ustc.edu.cn/crates.io-index"
+
+# 上海交通大学
+[source.sjtu]
+registry = "https://mirrors.sjtug.sjtu.edu.cn/git/crates.io-index/"
+
+# 清华大学
+[source.tuna]
+registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
+
+# rustcc社区
+[source.rustcc]
+registry = "https://code.aliyun.com/rustcc/crates.io-index.git"
